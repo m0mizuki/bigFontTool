@@ -1,0 +1,64 @@
+<!--python -m http.server 8000-->
+
+<!doctype html>
+<html lang="ja">
+
+<head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>My Project</title>
+    <link rel="stylesheet" href="styles.css" />
+</head>
+
+<body>
+    <label for="inputText">テキスト：</label>
+    <input id="inputText" type="text" />
+    <button id="convertButton" type="button">変換して表示</button>
+    <div><button id="copyButton" type="button">出力をコピー</button></div>
+    <script>
+        document.getElementById('copyButton').onclick = async () => {
+            const text = document.getElementById('output').textContent || '';
+            try {
+                if (navigator.clipboard?.writeText) await navigator.clipboard.writeText(text);
+                else {
+                    const ta = document.createElement('textarea');
+                    ta.value = text; ta.style.position = 'fixed'; ta.style.left = '-9999px';
+                    document.body.appendChild(ta); ta.select(); document.execCommand('copy'); document.body.removeChild(ta);
+                }
+                const btn = document.getElementById('copyButton'), prev = btn.textContent;
+                btn.textContent = 'コピーしました';
+                setTimeout(() => btn.textContent = prev, 1400);
+            } catch {
+                alert('コピーに失敗しました');
+            }
+        };
+    </script>
+    <div id="output" style="margin-top:1em; font-size:1.25em; white-space: pre-line; line-height:0.9;"></div>
+    <p style="font-size:0.8rem; color:#2f2f2f; margin-top:1rem;">※対応していない文字はすべて"あ"になります。</p>
+
+    <script>
+        dict = "あいうえおかきくけこさしすせそたちつてとなにぬねのはひふへほまみむめもやゆよらりるれろわをんがぎぐげござじずぜぞだぢづでどばびぶべぼぱぴぷぺぽっゃゅょー～"
+        dict_ary = Array.from(dict);
+        document.getElementById('convertButton').addEventListener('click', () => {
+            const value = document.getElementById('inputText').value || '';
+            fetch('font.json')
+                .then(response => response.json())
+                .then(data => {
+                    var words = "";
+                    for (val of value) {
+                        if (dict.includes(val)) {
+                            words += data[val]
+                        } else {
+                            words += data["あ"]
+                        }
+                    }
+                    words += "□□□□□□□□"
+                    document.getElementById('output').textContent = words;
+                })
+                .catch(error => console.error('Error:', error));
+
+        });
+    </script>
+</body>
+
+</html>

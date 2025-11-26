@@ -1,0 +1,5 @@
+jsonファイルをローカルで読み込めない
+
+pythonの簡易サーバ
+
+python -m http.server 8000
